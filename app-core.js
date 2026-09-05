@@ -1,0 +1,30 @@
+const SB_URL='https://smwshokworgzlxrprxko.supabase.co';
+const SB_KEY='sb_publishable_93HS4Zmjfs5_k3U7SeLCjA_4VEeKR4o';
+const sb=window.supabase.createClient(SB_URL,SB_KEY);
+const CRED='dars-hisoboti-independent-account', CACHE='dars-hisoboti-independent-state';
+let account=null,state=null,authMode='in',saveTimer=null,pollTimer=null,lastRemote='',applying=false,calendarDate=new Date(),modalAction=null;
+const $=id=>document.getElementById(id);
+function uid(p='id'){return p+'_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36)}
+function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function fmt(d){if(!d)return'';const [y,m,dd]=d.split('-');return `${dd}.${m}.${y}`}
+function deep(x){return JSON.parse(JSON.stringify(x))}
+function defState(){const g={id:uid('gr'),name:'1-guruh',roster:[],students:[],quizTotal:50,ratingEnabled:false};return{date:today(),groups:[g],archives:{},reportTitle:'Dars hisoboti',editorClosed:false,activeGroupId:g.id,returnSession:null,archiveEditing:null,lastOpenedDate:null}}
+function norm(s){s=s&&typeof s==='object'?s:defState();if(!Array.isArray(s.groups)||!s.groups.length)return defState();s.archives=s.archives||{};s.reportTitle=s.reportTitle||'Dars hisoboti';s.date=s.date||today();s.editorClosed=!!s.editorClosed;s.groups.forEach(g=>{g.roster=Array.isArray(g.roster)?g.roster:[];g.students=Array.isArray(g.students)?g.students:[];g.quizTotal=Math.max(1,Number(g.quizTotal)||50);g.ratingEnabled=!!g.ratingEnabled;g.students.forEach(st=>{st.id=st.id||uid('st');st.name=st.name||'';if(!('attendance'in st))st.attendance=null;if(!('vocab'in st))st.vocab=null;if(!('grammar'in st))st.grammar=null;if(!('quiz'in st))st.quiz=null})});if(!s.groups.find(g=>g.id===s.activeGroupId))s.activeGroupId=s.groups[0].id;return s}
+function group(){return state.groups.find(g=>g.id===state.activeGroupId)||state.groups[0]}
+function freshStudents(g){return (g.roster||[]).filter(Boolean).map((name,i)=>{const old=g.students.find(s=>s.name.trim()===String(name).trim());return{id:old?.id||uid('st'),name:String(name),attendance:null,vocab:null,grammar:null,quiz:null}})}
+function toast(t){$('toast').textContent=t;$('toast').classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').classList.remove('show'),1800)}
+function sync(kind,text){$('syncPill').className='pill '+kind;$('syncPill').textContent=text}
+function setAuthMsg(t){$('authMsg').textContent=t||'';$('authMsg').classList.toggle('hidden',!t)}
+function saveLocal(){localStorage.setItem(CACHE,JSON.stringify(state));scheduleSave()}
+function scheduleSave(){if(!account||applying)return;clearTimeout(saveTimer);saveTimer=setTimeout(push,700)}
+async function push(){if(!account||!state)return;if(!navigator.onLine){sync('off','📴 Oflayn');return}sync('sync','☁️ Saqlanmoqda…');const {data,error}=await sb.rpc('teacher_sync_save',{p_account_id:account.accountId,p_username:account.username,p_password:account.password,p_data:state});if(error){sync('err','⚠️ Sync xatosi');console.error(error);return}lastRemote=data||new Date().toISOString();sync('ok','✓ Saqlandi')}
+async function pull(silent=false){if(!account)return;const {data,error}=await sb.rpc('teacher_sync_load',{p_account_id:account.accountId,p_username:account.username,p_password:account.password});if(error){if(!silent)sync('err','⚠️ Ulanmadi');return}const row=Array.isArray(data)?data[0]:data;if(!row)return;if(lastRemote&&row.updated_at<=lastRemote)return;lastRemote=row.updated_at||'';applying=true;state=norm(row.data);localStorage.setItem(CACHE,JSON.stringify(state));render();applying=false;if(!silent)sync('ok','✓ Saqlandi')}
+async function login(u,p){const {data,error}=await sb.rpc('teacher_sync_login',{p_username:u.trim(),p_password:p.trim()});if(error)throw error;const row=Array.isArray(data)?data[0]:data;if(!row?.account_id)throw new Error('Username yoki parol noto‘g‘ri');account={accountId:row.account_id,username:u.trim().toLowerCase(),password:p.trim()};localStorage.setItem(CRED,JSON.stringify(account));state=norm(row.data);lastRemote=row.updated_at||'';localStorage.setItem(CACHE,JSON.stringify(state));startApp()}
+async function register(u,p){const {error}=await sb.rpc('teacher_sync_register',{p_username:u.trim(),p_password:p.trim()});if(error)throw error;await login(u,p)}
+function startApp(){$('authBg').classList.add('hidden');$('userLabel').textContent='@'+account.username;render();clearInterval(pollTimer);pollTimer=setInterval(()=>pull(true),4000);sync('ok','✓ Saqlandi')}
+function logout(){localStorage.removeItem(CRED);account=null;state=null;clearInterval(pollTimer);$('authBg').classList.remove('hidden');sync('sync','☁️ Kirish kerak')}
+function update(mut,rerender=true){mut(state);saveLocal();if(rerender)render()}
+function patchStudent(id,p,rerender=true){const s=group().students.find(x=>x.id===id);if(!s)return;Object.assign(s,p);group().roster=group().students.map(x=>x.name);saveLocal();if(rerender)renderStudentRow(id);updateReports()}
+function selectedArchive(date){return (state.archives[group().id]||{})[date]}
+function monthName(m){return ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'][m]}
+function renderCalendar(){const g=group();$('calTitle').textContent='📅 Kalendar — '+g.name;$('monthLabel').textContent=monthName(calendarDate.getMonth())+' '+calendarDate.getFullYear();const c=$('calendar');c.innerHTML='';const y=calendarDate.getFullYear(),m=calendarDate.getMonth(),first=new Date(y,m,1),off=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate();for(let i=0;i<off;i++){const b=document.createElement('button');b.className='day blank';c.appendChild(b)}for(let d=1;d<=days;d++){const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;const b=document.createElement('button');b.className='day';b.textContent=d;if(iso===today())b.classList.add('today');if(iso===state.date)b.classList.add('selected');if(selectedArchive(iso))b.classList.add('saved');b.onclick=()=>chooseDate(iso);c.appendChild(b)}}
