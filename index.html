@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dars Hisoboti Cloud</title>
+<link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+<div id="authBg" class="authbg">
+  <div class="auth">
+    <div class="authlogo">☁️</div><h1>Dars Hisoboti Cloud</h1><div class="desc">Telefon va kompyuterda bir xil ma’lumotlar</div>
+    <div class="card">
+      <div class="tabs"><button id="tabIn" class="tab active">Kirish</button><button id="tabUp" class="tab">Ro‘yxatdan o‘tish</button></div>
+      <div class="field"><label>Username</label><input id="loginUser" class="input" autocomplete="username" /></div>
+      <div class="field"><label>Parol</label><input id="loginPass" class="input" type="password" autocomplete="current-password" /></div>
+      <div id="authMsg" class="authmsg hidden"></div>
+      <button id="authSubmit" class="btn primary" style="width:100%;margin-top:8px">Kirish</button>
+    </div>
+    <div class="authnote">Bir xil username + parol bilan istalgan qurilmadan kiring.</div>
+  </div>
+</div>
+
+<header class="top"><div class="topin">
+  <div class="brand"><div class="logo">☁️</div><div class="brandtext"><b>Dars Hisoboti Cloud</b><small id="userLabel"></small></div></div>
+  <span id="syncPill" class="pill sync">☁️ Tekshirilmoqda…</span>
+  <button id="changePassBtn" class="topbtn">🔑 <span>Parolni almashtirish</span></button>
+  <button id="logoutBtn" class="topbtn">↪ <span>Chiqish</span></button>
+</div></header>
+
+<main class="wrap">
+  <div class="groupbar" id="groupBar"></div>
+  <div class="layout">
+    <aside class="side">
+      <section class="card"><div class="title" id="calTitle">📅 Kalendar</div><div class="calhead"><button class="calnav" id="prevM">‹</button><b id="monthLabel"></b><button class="calnav" id="nextM">›</button></div><div class="week"><div>Du</div><div>Se</div><div>Cho</div><div>Pa</div><div>Ju</div><div>Sha</div><div>Yak</div></div><div class="grid" id="calendar"></div><button id="todayBtn" class="btn outline" style="width:100%;margin-top:9px">Bugun</button></section>
+      <section class="card"><div class="title">⚙️ Dars sozlamalari</div>
+        <div class="field"><label>Hisobot sarlavhasi</label><input id="reportTitle" class="input"></div>
+        <div class="field"><label>Ishchi sana</label><input id="workDate" class="input" type="date"></div>
+        <div class="field"><label>Quiz savollari soni</label><input id="quizTotal" class="input" type="number" min="1"></div>
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#f7f7fb;padding:9px;border-radius:10px;font-size:11px"><span>Reytingni yoqish</span><input id="ratingEnabled" type="checkbox"></label>
+      </section>
+      <section class="card"><div class="title">🗂 Saqlangan hisobotlar</div><div id="archiveList" class="sub">Hozircha yo‘q</div></section>
+    </aside>
+
+    <section>
+      <div id="editorCard" class="card editorcard">
+        <div class="editorhead"><div class="title" id="editorTitle"></div><button id="newLessonBtn" class="btn outline">Yangi dars (tozalash)</button><button id="saveCloseBtn" class="btn primary">Saqlash va yopish</button></div>
+        <div class="student-tools"><button id="addStudentBtn" class="btn primary">👥 O‘quvchi qo‘shish</button><button id="groupsBtn" class="btn outline">⚙️ Guruhlar</button><span class="count" id="studentCount"></span></div>
+        <div class="tablewrap"><div class="students"><div class="thead"><div></div><div>Ism familiya</div><div>Davomat</div><div>So‘zlar</div><div>Grammatika</div><div>Quiz</div><div></div></div><div id="studentRows"></div></div></div>
+      </div>
+      <div id="closedCard" class="card closed hidden"><div class="big">✅</div><h2>Hisobot saqlandi va yopildi</h2><p id="closedText"></p><div class="closedactions"><button id="reopenBtn" class="btn primary">Qayta ochish</button><button id="copyClosedBtn" class="btn outline">📋 Nusxa olish</button><button id="closedNewBtn" class="btn soft">📅 Yangi dars</button></div></div>
+      <div id="reportsWrap" class="reports">
+        <section class="card report"><div class="title">📋 Telegram uchun tayyor hisobot</div><textarea id="mainReport"></textarea><div class="reportactions"><button id="copyMain" class="btn primary">📋 Nusxa olish</button></div></section>
+        <section class="card report"><div class="title">🚫 Darsga kelmaganlar</div><textarea id="absenceReport"></textarea><div class="reportactions"><button id="copyAbs" class="btn outline">📋 Nusxa olish</button></div></section>
+      </div>
+      <section id="ratingCard" class="card hidden" style="margin-top:12px"><div class="title">🏆 Reyting</div><div id="ratingList" class="ratinglist"></div><textarea id="ratingReport" class="input" style="min-height:140px;margin-top:10px"></textarea><div class="reportactions"><button id="copyRating" class="btn primary">📋 Reytingni nusxalash</button></div></section>
+    </section>
+  </div>
+</main>
+
+<div id="modalBg" class="modalbg hidden"><div class="modal"><h3 id="modalTitle"></h3><div id="modalBody"></div><div class="modalacts"><button id="modalCancel" class="btn neutral">Bekor qilish</button><button id="modalOk" class="btn primary">Saqlash</button></div></div></div>
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+
+</body></html>
