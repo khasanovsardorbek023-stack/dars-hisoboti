@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Dars Hisoboti Cloud</title>
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="phone.css">
 </head>
 <body>
 <div id="authBg" class="authbg">
@@ -43,12 +44,12 @@
       <div id="editorCard" class="card editorcard">
         <div class="editorhead"><div class="title" id="editorTitle"></div><button id="newLessonBtn" class="btn outline">Yangi dars (tozalash)</button><button id="saveCloseBtn" class="btn primary">Saqlash va yopish</button></div>
         <div class="student-tools"><button id="addStudentBtn" class="btn primary">👥 O‘quvchi qo‘shish</button><button id="groupsBtn" class="btn outline">⚙️ Guruhlar</button><span class="count" id="studentCount"></span></div>
-        <div class="tablewrap"><div class="students"><div class="thead"><div></div><div>Ism familiya</div><div>Davomat</div><div>So‘zlar</div><div>Grammatika</div><div>Quiz</div><div></div></div><div id="studentRows"></div></div></div>
+        <div class="tablewrap"><div class="students"><div class="thead"><div></div><div>Ism familiya / telefon</div><div>Davomat</div><div>So‘zlar</div><div>Grammatika</div><div>Quiz</div><div></div></div><div id="studentRows"></div></div></div>
       </div>
-      <div id="closedCard" class="card closed hidden"><div class="big">✅</div><h2>Hisobot saqlandi va yopildi</h2><p id="closedText"></p><div class="closedactions"><button id="reopenBtn" class="btn primary">Qayta ochish</button><button id="copyClosedBtn" class="btn outline">📋 Nusxa olish</button><button id="closedNewBtn" class="btn soft">📅 Yangi dars</button></div></div>
+      <div id="closedCard" class="card closed hidden"><div class="big">✅</div><h2>Hisobot saqlandi va yopildi</h2><p id="closedText"></p><div class="closedactions"><button id="reopenBtn" class="btn primary">Qayta ochish</button><button id="copyClosedBtn" class="btn outline">📋 Nomersiz nusxa</button><button id="copyClosedPhoneBtn" class="btn soft">📞 Nomer bilan nusxa</button><button id="closedNewBtn" class="btn soft">📅 Yangi dars</button></div></div>
       <div id="reportsWrap" class="reports">
-        <section class="card report"><div class="title">📋 Telegram uchun tayyor hisobot</div><textarea id="mainReport"></textarea><div class="reportactions"><button id="copyMain" class="btn primary">📋 Nusxa olish</button></div></section>
-        <section class="card report"><div class="title">🚫 Darsga kelmaganlar</div><textarea id="absenceReport"></textarea><div class="reportactions"><button id="copyAbs" class="btn outline">📋 Nusxa olish</button></div></section>
+        <section class="card report"><div class="title">📋 Telegram uchun tayyor hisobot</div><textarea id="mainReport"></textarea><div class="reportactions"><button id="copyMain" class="btn primary">📋 Nomersiz nusxa</button><button id="copyMainPhone" class="btn soft">📞 Nomer bilan nusxa</button></div></section>
+        <section class="card report"><div class="title">🚫 Darsga kelmaganlar</div><textarea id="absenceReport"></textarea><div class="reportactions"><button id="copyAbs" class="btn outline">📋 Nomersiz nusxa</button><button id="copyAbsPhone" class="btn soft">📞 Nomer bilan nusxa</button></div></section>
       </div>
       <section id="ratingCard" class="card hidden" style="margin-top:12px"><div class="title">🏆 Reyting</div><div id="ratingList" class="ratinglist"></div><textarea id="ratingReport" class="input" style="min-height:140px;margin-top:10px"></textarea><div class="reportactions"><button id="copyRating" class="btn primary">📋 Reytingni nusxalash</button></div></section>
     </section>
@@ -59,5 +60,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app-core.js"></script>
 <script src="app-ui.js"></script>
+<script src="app-phone.js"></script>
 <script src="app-init.js"></script>
 </body></html>
