@@ -90,6 +90,56 @@ newLesson = function(date = state.date){
   toast('Yangi dars tayyor ✅');
 };
 
+// Website ochilganda oxirgi ishlatilgan sana emas, qurilmadagi bugungi sana ochiladi.
+// Agar bugungi hisobot avval saqlangan bo‘lsa, aynan o‘sha saqlangan holat tiklanadi.
+function openTodayOnStartup(){
+  if (!state || !account) return;
+  const d = today();
+  calendarDate = new Date(d + 'T12:00:00');
+
+  if (state.date === d && !state.archiveEditing){
+    renderCalendar();
+    return;
+  }
+
+  const g = group();
+  const archivedToday = (state.archives?.[g.id] || {})[d];
+
+  if (archivedToday){
+    g.students = deep(archivedToday.students || []);
+    g.roster = g.students.map(s => s.name || '');
+    g.quizTotal = archivedToday.quizTotal || g.quizTotal;
+    g.ratingEnabled = !!archivedToday.ratingEnabled;
+    if (typeof normalizedReportSections === 'function') {
+      g.reportSections = normalizedReportSections(archivedToday.reportSections);
+    }
+    state.date = d;
+    state.editorClosed = true;
+    state.archiveEditing = null;
+    state.returnSession = null;
+  } else {
+    const identities = persistentStudentsForNewDate();
+    restorePersistentLessonSettings();
+    resetDailyFieldsKeepStudents(g, identities);
+    state.date = d;
+    state.editorClosed = false;
+    state.archiveEditing = null;
+    state.returnSession = null;
+  }
+
+  saveLocal();
+  render();
+}
+
+// Avtomatik login app-daily.js yuklanishidan oldin tugashi mumkin, shuning uchun
+// hozirgi sessiyani ham, keyinchalik qo‘lda kirishni ham qamrab olamiz.
+const baseStartAppToday = startApp;
+startApp = function(){
+  baseStartAppToday();
+  setTimeout(openTodayOnStartup, 0);
+};
+setTimeout(openTodayOnStartup, 0);
+
 // app-init dagi sana tugmalarini yangi xavfsiz funksiyaga ulaymiz.
 if ($('todayBtn')) $('todayBtn').onclick = () => chooseDate(today());
 if ($('workDate')) $('workDate').onchange = e => { if (e.target.value) chooseDate(e.target.value); };
