@@ -14,13 +14,13 @@ function resetDailyFieldsKeepStudents(g, identitySource=null){
   g.roster = g.students.map(s => s.name);
 }
 
-// Arxiv hisobotini tahrirlashga kirilganda app-phone.js joriy ishchi darsni
-// returnSession ichida saqlaydi. Yangi sanaga o‘tayotganda ism va telefonlarni
-// eski arxivdan emas, aynan shu joriy ro‘yxatdan olish kerak.
+// Arxiv hisobotini tahrirlashga kirilganda joriy ishchi dars returnSession ichida saqlanadi.
+// Yangi sanaga o‘tayotganda ism va telefonlarni eski arxivdan emas, shu doimiy ro‘yxatdan olamiz.
 function persistentStudentsForNewDate(){
   const g = group();
-  if (state.archiveEditing && state.returnSession && Array.isArray(state.returnSession.students)) {
-    return state.returnSession.students.map(s => ({
+  const rs = state.returnSession;
+  if (rs && rs.groupId === g.id && rs.date !== state.date && Array.isArray(rs.students)) {
+    return rs.students.map(s => ({
       id: s.id || uid('st'),
       name: s.name || '',
       phone: s.phone || ''
@@ -31,6 +31,18 @@ function persistentStudentsForNewDate(){
     name: s.name || '',
     phone: s.phone || ''
   }));
+}
+
+// Arxiv tahriridan yangi kunga chiqilganda avvalgi ishchi darsning umumiy sozlamalarini ham qaytaramiz.
+function restorePersistentLessonSettings(){
+  const g = group();
+  const rs = state.returnSession;
+  if (!rs || rs.groupId !== g.id || rs.date === state.date) return;
+  if (rs.quizTotal != null) g.quizTotal = Math.max(1, Number(rs.quizTotal) || 1);
+  if (rs.ratingEnabled != null) g.ratingEnabled = !!rs.ratingEnabled;
+  if (rs.reportSections && typeof normalizedReportSections === 'function') {
+    g.reportSections = normalizedReportSections(rs.reportSections);
+  }
 }
 
 chooseDate = function(date){
@@ -44,8 +56,6 @@ chooseDate = function(date){
   }
 
   // Shu sananing o‘zini qayta bosish hech narsani o‘chirmaydi.
-  // Arxiv tahrirlash rejimida bo‘lsak esa bu qoida ishlamaydi: yangi ishchi
-  // holatga chiqish uchun pastdagi reset bajarilishi kerak.
   if (date === state.date && !state.archiveEditing){
     calendarDate = new Date(date + 'T12:00:00');
     renderCalendar();
@@ -53,6 +63,7 @@ chooseDate = function(date){
   }
 
   const identities = persistentStudentsForNewDate();
+  restorePersistentLessonSettings();
   resetDailyFieldsKeepStudents(group(), identities);
   state.date = date;
   state.editorClosed = false;
@@ -67,6 +78,7 @@ chooseDate = function(date){
 // "Yangi dars" ham xuddi shu tamoyilda ishlaydi.
 newLesson = function(date = state.date){
   const identities = persistentStudentsForNewDate();
+  restorePersistentLessonSettings();
   resetDailyFieldsKeepStudents(group(), identities);
   state.date = date;
   state.editorClosed = false;
