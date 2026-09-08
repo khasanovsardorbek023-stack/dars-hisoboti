@@ -1,4 +1,4 @@
-/* Desktop jadvalini ixchamlashtirish va ism/telefon ustunini gorizontal scroll paytida qotirish. */
+/* Desktop jadvalini ixcham saqlab, ustunlar orasiga yetarli nafas berish va ism/telefonni sticky qilish. */
 @media (min-width:1001px){
   .wrap{max-width:1600px;padding-left:12px;padding-right:12px}
   .topin{max-width:1600px}
@@ -6,46 +6,72 @@
   .editorcard{padding:12px}
   .tablewrap{overflow-x:auto;overflow-y:visible;position:relative;scrollbar-gutter:stable}
 
-  .students{min-width:1110px}
+  /* Ustunlar orasidagi masofa oldingidan kengroq, lekin laptop ekraniga sig‘ishga yaqin. */
+  .students{min-width:1155px}
   .thead,.srow{
     grid-template-columns:
-      24px 220px 108px 108px 108px 116px 102px 102px 82px 25px;
-    gap:7px;
+      34px 220px 108px 108px 108px 118px 110px 110px 84px 25px;
+    gap:12px;
   }
-  .thead{padding-left:6px;padding-right:6px;font-size:10px;line-height:1.2}
-  .srow{padding:10px 6px;margin-bottom:7px}
+  .thead{padding-left:6px;padding-right:6px;font-size:10px;line-height:1.25}
+  .srow{padding:12px 7px;margin-bottom:9px}
   .nameinput{min-width:0}
   .identitybox .input{padding:7px 8px}
 
-  /* Variantlar ustma-ust, lekin bir-biriga yopishib qolmaydi. */
+  /* Har bir bo‘lim ichidagi variantlar ham bir-biriga yopishmaydi. */
   .srow .status{
     display:flex;
     flex-direction:column;
     flex-wrap:nowrap;
     align-items:flex-start;
-    gap:7px;
+    gap:9px;
   }
   .srow .opt{
     width:max-content;
     max-width:100%;
     padding:5px 7px;
     font-size:9px;
-    line-height:1.05;
+    line-height:1.08;
   }
   .quizinput{width:58px;padding:6px 4px}
   .pct{font-size:9px}
 
+  /* Tartib raqami va ism/telefon gorizontal scroll paytida joyida qoladi. */
   .thead>div:nth-child(1),.srow>div:nth-child(1){position:sticky;left:0;z-index:8}
-  .thead>div:nth-child(2),.srow>div:nth-child(2){position:sticky;left:30px;z-index:7}
+  .thead>div:nth-child(2),.srow>div:nth-child(2){position:sticky;left:46px;z-index:7}
   .thead>div:nth-child(1),.thead>div:nth-child(2){background:#fff}
   .srow>div:nth-child(1),.srow>div:nth-child(2){background:#fafafd}
   .srow:focus-within>div:nth-child(1),.srow:focus-within>div:nth-child(2){background:#fff}
   .thead>div:nth-child(2),.srow>div:nth-child(2){box-shadow:8px 0 12px -12px rgba(17,24,39,.55)}
+
+  .rownumcell{display:flex;justify-content:center;align-items:flex-start;padding-top:2px}
+  .rownum{
+    width:29px;height:29px;border:0;border-radius:9px;background:transparent;
+    color:#7a818e;font-size:11px;font-weight:900;cursor:default;padding:0;
+  }
+  .bulk-mode .rownum{cursor:pointer;background:#f0edff;color:#654bd0}
+  .bulk-mode .rownum:hover{background:#e5dfff}
+  .rownum.selected{background:var(--primary)!important;color:#fff!important;box-shadow:0 3px 10px rgba(109,74,255,.22)}
+  .srow.bulk-selected{border-color:#cec4ff;background:#fdfcff}
+  .srow.bulk-selected>div:nth-child(1),.srow.bulk-selected>div:nth-child(2){background:#fdfcff}
 }
 
+.bulk-toolbar{
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  margin:0 0 10px;padding:9px 10px;border:1px solid #e3defe;
+  border-radius:12px;background:#faf9ff;
+}
+.bulk-toolbar .bulk-info{font-size:11px;font-weight:850;color:#604ac0;margin-right:2px}
+.bulk-toolbar .btn{padding:7px 9px;font-size:10px}
+
 @media (min-width:1450px){
-  .students{min-width:1080px}
-  .thead,.srow{
-    grid-template-columns:24px 220px 104px 104px 104px 112px 98px 98px 80px 25px;
-  }
+  .students{min-width:1135px}
+}
+
+@media (max-width:1000px){
+  .rownumcell{display:flex!important;justify-content:flex-start;margin:0 0 5px!important}
+  .rownum{width:30px;height:30px;border:0;border-radius:9px;background:#f3f4f7;color:#626a77;font-weight:900}
+  .bulk-mode .rownum{background:#f0edff;color:#654bd0}
+  .rownum.selected{background:var(--primary)!important;color:#fff!important}
+  .bulk-toolbar{margin:0 0 10px}
 }
