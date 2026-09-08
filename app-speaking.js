@@ -1,5 +1,5 @@
 // "Speaking savollariga berilgan javoblar" hisobot bo‘limi.
-// Variantlar: A’lo, Yaxshi, Qoniqarli, Qoniqarsiz.
+// Variantlar: A’lo, Yaxshi, O‘rtacha, Qoniqarli, Qoniqarsiz.
 // Bu bo‘lim reyting formulasiga ta'sir qilmaydi.
 
 const baseNormalizedSpeaking = normalizedReportSections;
@@ -87,11 +87,13 @@ function speakingLabel(v){
     ? '🌟 A’lo'
     : v === 'yaxshi'
       ? '✅ Yaxshi'
-      : v === 'qoniqarli'
-        ? '⚠️ Qoniqarli'
-        : v === 'qoniqarsiz'
-          ? '❌ Qoniqarsiz'
-          : '➖ Belgilanmagan';
+      : v === 'ortacha'
+        ? '🟡 O‘rtacha'
+        : v === 'qoniqarli'
+          ? '⚠️ Qoniqarli'
+          : v === 'qoniqarsiz'
+            ? '❌ Qoniqarsiz'
+            : '➖ Belgilanmagan';
 }
 
 // Uyga vazifa va Darsda qatnashish ko‘rsatkichi orasiga Speaking ustuni.
@@ -100,7 +102,7 @@ rowHtml = function(s){
   const html = baseRowHtmlSpeaking(s);
   const absent = s.attendance === 'kelmadi';
   const opt = (val,label,tone) => `<button class="opt ${s.speaking===val?'on '+tone:''}" data-act="speaking" data-val="${val}" ${absent?'disabled':''}>${label}</button>`;
-  const cell = `<div class="mobilelabel" data-label="Speaking savollariga berilgan javoblar"><div class="status">${opt('alo','A’lo','good')}${opt('yaxshi','Yaxshi','good')}${opt('qoniqarli','Qoniqarli','warn')}${opt('qoniqarsiz','Qoniqarsiz','bad')}</div></div>`;
+  const cell = `<div class="mobilelabel" data-label="Speaking savollariga berilgan javoblar"><div class="status">${opt('alo','A’lo','good')}${opt('yaxshi','Yaxshi','good')}${opt('ortacha','O‘rtacha','warn')}${opt('qoniqarli','Qoniqarli','warn')}${opt('qoniqarsiz','Qoniqarsiz','bad')}</div></div>`;
   const marker = '<div class="mobilelabel" data-label="Darsda qatnashish ko‘rsatkichi">';
   return html.replace(marker, cell + marker);
 };
