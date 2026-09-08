@@ -5,27 +5,43 @@
   .layout{grid-template-columns:275px minmax(0,1fr);gap:12px}
   .editorcard{padding:12px}
   .tablewrap{overflow-x:auto;overflow-y:visible;position:relative;scrollbar-gutter:stable}
-  .students{min-width:1360px}
+
+  /* Variantlar ustma-ust bo‘lgani uchun ustunlar ancha toraydi. */
+  .students{min-width:1110px}
   .thead,.srow{
     grid-template-columns:
       24px
-      222px
-      146px
-      136px
-      136px
-      160px
-      158px
-      166px
-      92px
-      26px;
+      220px
+      108px
+      108px
+      108px
+      116px
+      102px
+      102px
+      82px
+      25px;
     gap:6px;
   }
   .thead{padding-left:6px;padding-right:6px;font-size:10px;line-height:1.2}
-  .srow{padding:7px 6px;margin-bottom:5px}
+  .srow{padding:8px 6px;margin-bottom:6px}
   .nameinput{min-width:0}
   .identitybox .input{padding:7px 8px}
-  .status{gap:4px}
-  .opt{padding:5px 7px;font-size:9px;line-height:1.05}
+
+  /* Barcha option variantlari bir-birining tagida turadi. */
+  .srow .status{
+    display:flex;
+    flex-direction:column;
+    flex-wrap:nowrap;
+    align-items:flex-start;
+    gap:4px;
+  }
+  .srow .opt{
+    width:max-content;
+    max-width:100%;
+    padding:5px 7px;
+    font-size:9px;
+    line-height:1.05;
+  }
   .quizinput{width:58px;padding:6px 4px}
   .pct{font-size:9px}
 
@@ -53,18 +69,18 @@
 }
 
 @media (min-width:1450px){
-  .students{min-width:1325px}
+  .students{min-width:1080px}
   .thead,.srow{
     grid-template-columns:
       24px
       220px
-      142px
-      132px
-      132px
-      154px
-      154px
-      160px
-      88px
+      104px
+      104px
+      104px
+      112px
+      98px
+      98px
+      80px
       25px;
   }
 }
