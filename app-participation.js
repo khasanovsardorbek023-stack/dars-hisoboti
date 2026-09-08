@@ -1,4 +1,5 @@
-// "Dars davomida" hisobot bo‘limi: yaxshi/yaxshi emas/umuman qatnashmadi.
+// "Darsda qatnashish ko‘rsatkichi" hisobot bo‘limi.
+// Darajalar: A’lo, Yaxshi, O‘rtacha, Qoniqarli, Qoniqarsiz.
 // Bu bo‘lim reyting formulasiga ta'sir qilmaydi.
 
 const baseNormalizedParticipation = normalizedReportSections;
@@ -11,6 +12,14 @@ normalizedReportSections = function(v){
       : v.participation !== false
   };
 };
+
+function migrateParticipationValue(v){
+  // Oldingi 3 ta variantdan yangi 5 ta variantga moslash.
+  if (v === 'yaxshi_emas') return 'qoniqarli';
+  if (v === 'umuman') return 'qoniqarsiz';
+  if (['alo','yaxshi','ortacha','qoniqarli','qoniqarsiz'].includes(v)) return v;
+  return null;
+}
 
 // Eski arxivlarda bu funksiya mavjud bo‘lmagan, shuning uchun ularda avtomatik ko‘rsatmaymiz.
 const baseNormParticipation = norm;
@@ -31,7 +40,7 @@ norm = function(s){
     ensureReportSections(g);
     if (!Object.prototype.hasOwnProperty.call(g.reportSections,'participation')) g.reportSections.participation = true;
     (g.students || []).forEach(st => {
-      if (!Object.prototype.hasOwnProperty.call(st,'participation')) st.participation = null;
+      st.participation = migrateParticipationValue(st.participation);
     });
   });
   Object.entries(out.archives || {}).forEach(([gid, groupArchives]) => {
@@ -39,7 +48,7 @@ norm = function(s){
       a.reportSections = normalizedReportSections(a.reportSections);
       if (missingInOldArchives.has(gid + '|' + date)) a.reportSections.participation = false;
       (a.students || []).forEach(st => {
-        if (!Object.prototype.hasOwnProperty.call(st,'participation')) st.participation = null;
+        st.participation = migrateParticipationValue(st.participation);
       });
     });
   });
@@ -53,7 +62,7 @@ norm = function(s){
   if (!quizToggle?.parentNode) return;
   const label = document.createElement('label');
   label.style.cssText = 'display:flex;align-items:center;gap:7px;font-size:11px';
-  label.innerHTML = '<input id="sectionParticipation" type="checkbox"> Dars davomida';
+  label.innerHTML = '<input id="sectionParticipation" type="checkbox"> Darsda qatnashish ko‘rsatkichi';
   quizToggle.parentNode.insertBefore(label, quizToggle);
 })();
 
@@ -74,13 +83,17 @@ if ($('sectionParticipation')) {
 }
 
 function participationLabel(v){
-  return v === 'yaxshi'
-    ? '✅ Yaxshi qatnashdi'
-    : v === 'yaxshi_emas'
-      ? '⚠️ Yaxshi qatnashmadi'
-      : v === 'umuman'
-        ? '❌ Umuman qatnashmadi'
-        : '➖ Belgilanmagan';
+  return v === 'alo'
+    ? '🌟 A’lo'
+    : v === 'yaxshi'
+      ? '✅ Yaxshi'
+      : v === 'ortacha'
+        ? '🟡 O‘rtacha'
+        : v === 'qoniqarli'
+          ? '⚠️ Qoniqarli'
+          : v === 'qoniqarsiz'
+            ? '❌ Qoniqarsiz'
+            : '➖ Belgilanmagan';
 }
 
 // Grammatika va Quiz orasiga yangi ustun qo‘shamiz.
@@ -89,7 +102,7 @@ rowHtml = function(s){
   const html = baseRowHtmlParticipation(s);
   const absent = s.attendance === 'kelmadi';
   const opt = (val,label,tone) => `<button class="opt ${s.participation===val?'on '+tone:''}" data-act="participation" data-val="${val}" ${absent?'disabled':''}>${label}</button>`;
-  const cell = `<div class="mobilelabel" data-label="Dars davomida"><div class="status">${opt('yaxshi','Yaxshi qatnashdi','good')}${opt('yaxshi_emas','Yaxshi qatnashmadi','warn')}${opt('umuman','Umuman qatnashmadi','bad')}</div></div>`;
+  const cell = `<div class="mobilelabel" data-label="Darsda qatnashish ko‘rsatkichi"><div class="status">${opt('alo','A’lo','good')}${opt('yaxshi','Yaxshi','good')}${opt('ortacha','O‘rtacha','warn')}${opt('qoniqarli','Qoniqarli','warn')}${opt('qoniqarsiz','Qoniqarsiz','bad')}</div></div>`;
   return html.replace('<div class="mobilelabel" data-label="Quiz">', cell + '<div class="mobilelabel" data-label="Quiz">');
 };
 
@@ -144,7 +157,7 @@ mainText = function(src, includePhone=false){
     if (sec.attendance) l.push(`👨‍🏫 Davomat: ${s.attendance==='keldi'?'✅ Keldi':s.attendance==='kech'?'⏰ Kech qolib keldi':'➖ Belgilanmagan'}`);
     if (sec.vocab) l.push(`🔤 So‘zlar: ${taskLabel(s.vocab)}`);
     if (sec.grammar) l.push(`📘 Grammatika: ${taskLabel(s.grammar)}`);
-    if (sec.participation) l.push(`🙋 Dars davomida: ${participationLabel(s.participation)}`);
+    if (sec.participation) l.push(`🙋 Darsda qatnashish ko‘rsatkichi: ${participationLabel(s.participation)}`);
     if (sec.quiz) l.push(`📝 Quiz / test: ${s.quiz==null?'➖':`${s.quiz}/${src.quizTotal} (${Math.round(s.quiz/src.quizTotal*100)}%)`}`);
     return l.join('\n');
   });
