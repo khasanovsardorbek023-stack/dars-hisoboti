@@ -9,6 +9,7 @@ function resetDailyFieldsKeepStudents(g, identitySource=null){
     attendance: null,
     vocab: null,
     grammar: null,
+    participation: null,
     quiz: null
   }));
   g.roster = g.students.map(s => s.name);
