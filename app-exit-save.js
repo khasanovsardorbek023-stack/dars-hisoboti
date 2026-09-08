@@ -39,3 +39,13 @@ logout = async function(){
   }
   baseLogoutWithSave();
 };
+
+// Telegram hisobotidagi status emojilarini chiroyliroq variantlarga almashtiruvchi faylni yuklaymiz.
+(function loadReportEmojiOverrides(){
+  const script = document.createElement('script');
+  script.src = 'app-report-emojis.js?v=20260908-2332';
+  script.onload = () => {
+    try { if (state) updateReports(); } catch {}
+  };
+  document.head.appendChild(script);
+})();
