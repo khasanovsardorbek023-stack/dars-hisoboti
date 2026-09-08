@@ -20,14 +20,14 @@
       26px;
     gap:6px;
   }
-  .thead{padding-left:6px;padding-right:6px;font-size:9px}
+  .thead{padding-left:6px;padding-right:6px;font-size:10px;line-height:1.2}
   .srow{padding:7px 6px;margin-bottom:5px}
   .nameinput{min-width:0}
   .identitybox .input{padding:7px 8px}
-  .status{gap:3px}
-  .opt{padding:4px 6px;font-size:8px}
+  .status{gap:4px}
+  .opt{padding:5px 7px;font-size:9px;line-height:1.05}
   .quizinput{width:58px;padding:6px 4px}
-  .pct{font-size:8px}
+  .pct{font-size:9px}
 
   /* Birinchi ikki ustun gorizontal scroll paytida joyida qoladi. */
   .thead>div:nth-child(1),
