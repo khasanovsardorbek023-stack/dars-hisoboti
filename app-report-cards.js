@@ -39,7 +39,6 @@ mainText = function(src, includePhone=false){
     if (sec.quiz) lines.push(`📝 Quiz / test: ${s.quiz==null?'➖':`${s.quiz}/${src.quizTotal} (${Math.round(s.quiz/src.quizTotal*100)}%)`}`);
 
     const overall = overallResultPercent(s, src);
-    lines.push('');
     lines.push(`📊 Umumiy natijalar foizi: ${overall == null ? '➖' : overall + '%'}`);
     lines.push(border);
     return lines.join('\n');
