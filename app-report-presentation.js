@@ -41,15 +41,47 @@ source = function(){
   return {...src, mainReportRanked: !!group().mainReportRanked};
 };
 
-function reportScore(s, src){
-  try {
-    return score(s, {
-      quizTotal: Math.max(1, Number(src.quizTotal) || 1),
-      reportSections: normalizedReportSections(src.reportSections)
-    });
-  } catch {
-    return 0;
+function taskPercent(v){
+  return v === 'topshirdi' ? 100 : v === 'chala' ? 50 : v === 'topshirmadi' ? 0 : null;
+}
+function homeworkPercent(v){
+  return v === 'bajarildi' ? 100 : v === 'chala' ? 50 : v === 'bajarilmadi' ? 0 : null;
+}
+function levelPercent(v){
+  return v === 'alo' ? 100
+    : v === 'yaxshi' ? 80
+    : v === 'ortacha' ? 60
+    : v === 'qoniqarli' ? 40
+    : v === 'qoniqarsiz' ? 20
+    : null;
+}
+function attendancePercent(v){
+  return v === 'keldi' ? 100 : v === 'kech' ? 70 : v === 'kelmadi' ? 0 : null;
+}
+function overallResultPercent(s, src){
+  const sec = normalizedReportSections(src.reportSections);
+  if (sec.attendance && s.attendance === 'kelmadi') return 0;
+
+  const values = [];
+  const add = v => { if (typeof v === 'number' && Number.isFinite(v)) values.push(Math.max(0, Math.min(100, v))); };
+
+  if (sec.attendance) add(attendancePercent(s.attendance));
+  if (sec.vocab) add(taskPercent(s.vocab));
+  if (sec.grammar) add(taskPercent(s.grammar));
+  if (sec.homework) add(homeworkPercent(s.homework));
+  if (sec.speaking) add(levelPercent(s.speaking));
+  if (sec.participation) add(levelPercent(s.participation));
+  if (sec.quiz && s.quiz != null && s.quiz !== '') {
+    add(Math.min(100, Math.max(0, Number(s.quiz) / Math.max(1, Number(src.quizTotal) || 1) * 100)));
   }
+
+  if (!values.length) return null;
+  return Math.round(values.reduce((a,b)=>a+b,0) / values.length);
+}
+
+function reportScore(s, src){
+  const p = overallResultPercent(s, src);
+  return p == null ? 0 : p;
 }
 
 function orderedStudentsForMainReport(src){
@@ -60,23 +92,35 @@ function orderedStudentsForMainReport(src){
   return arr.sort((a,b) => (b.p - a.p) || (a.index - b.index));
 }
 
+// Telegram uchun foydalanuvchi tanlagan aniq emoji va yozuvlar.
 function prettyTaskLabel(v){
-  const t = taskLabel(v);
-  return t.replace(/^⚠️\s*/, '🟠 ');
+  return v === 'topshirdi' ? 'Topshirildi ✅'
+    : v === 'chala' ? 'Chala topshirildi ⚠️'
+    : v === 'topshirmadi' ? 'Topshirilmadi ❌'
+    : 'Belgilanmagan ➖';
 }
 function prettyHomeworkLabel(v){
-  const t = homeworkLabel(v);
-  return t.replace(/^⚠️\s*/, '🟠 ');
+  return v === 'bajarildi' ? 'Bajarilingan ✅'
+    : v === 'chala' ? 'Chala bajarilingan ⚠️'
+    : v === 'bajarilmadi' ? 'Bajarilinmagan ❌'
+    : 'Belgilanmagan ➖';
 }
 function prettySpeakingLabel(v){
-  if (v === 'ortacha') return '🙂 O‘rtacha';
-  if (v === 'qoniqarli') return '👍 Qoniqarli';
-  return speakingLabel(v);
+  return v === 'alo' ? 'A’lo 🏆'
+    : v === 'yaxshi' ? 'Yaxshi 🏅'
+    : v === 'ortacha' ? 'O‘rtacha ✅'
+    : v === 'qoniqarli' ? 'Qoniqarli ⚠️'
+    : v === 'qoniqarsiz' ? 'Qoniqarsiz ❌'
+    : 'Belgilanmagan ➖';
 }
 function prettyParticipationLabel(v){
-  if (v === 'ortacha') return '🙂 O‘rtacha';
-  if (v === 'qoniqarli') return '👍 Qoniqarli';
-  return participationLabel(v);
+  return prettySpeakingLabel(v);
+}
+function prettyAttendanceLabel(v){
+  return v === 'keldi' ? 'Keldi ✅'
+    : v === 'kech' ? 'Kech keldi ⏰'
+    : v === 'kelmadi' ? 'Kelmadi ❌'
+    : 'Belgilanmagan ➖';
 }
 
 mainText = function(src, includePhone=false){
@@ -99,18 +143,22 @@ mainText = function(src, includePhone=false){
 
     if (includePhone && String(s.phone || '').trim()) lines.push(`📞 Telefon: ${String(s.phone).trim()}`);
 
+    if (sec.attendance) lines.push(`👨‍🏫 Davomat: ${prettyAttendanceLabel(s.attendance)}`);
+
     if (sec.attendance && s.attendance === 'kelmadi') {
-      lines.push('🚫 Darsga kelmadi');
+      lines.push('📊 Umumiy natijalar foizi: 0%');
       return lines.join('\n');
     }
 
-    if (sec.attendance) lines.push(`👨‍🏫 Davomat: ${s.attendance==='keldi'?'✅ Keldi':s.attendance==='kech'?'⏰ Kech qolib keldi':'➖ Belgilanmagan'}`);
     if (sec.vocab) lines.push(`🔤 So‘zlar: ${prettyTaskLabel(s.vocab)}`);
     if (sec.grammar) lines.push(`📘 Grammatika: ${prettyTaskLabel(s.grammar)}`);
-    if (sec.homework) lines.push(`🏠 Uyga vazifa qilib berilgan mashqlar: ${prettyHomeworkLabel(s.homework)}`);
+    if (sec.homework) lines.push(`🏠 Uyga vazifa qilib berilgan Topshiriqlar: ${prettyHomeworkLabel(s.homework)}`);
     if (sec.speaking) lines.push(`🗣 Gapirish savollariga berilgan javoblar: ${prettySpeakingLabel(s.speaking)}`);
     if (sec.participation) lines.push(`🙋 Darsda qatnashish ko‘rsatkichi: ${prettyParticipationLabel(s.participation)}`);
     if (sec.quiz) lines.push(`📝 Quiz / test: ${s.quiz==null?'➖':`${s.quiz}/${src.quizTotal} (${Math.round(s.quiz/src.quizTotal*100)}%)`}`);
+
+    const overall = overallResultPercent(s, src);
+    lines.push(`📊 Umumiy natijalar foizi: ${overall == null ? '➖' : overall + '%'}`);
     return lines.join('\n');
   });
 
