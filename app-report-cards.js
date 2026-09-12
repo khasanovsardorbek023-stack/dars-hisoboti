@@ -35,7 +35,7 @@ mainText = function(src, includePhone=false){
     if (sec.grammar) lines.push(`📘 Grammatika: ${prettyTaskLabel(s.grammar)}`);
     if (sec.homework) lines.push(`🏠 Uyga vazifa qilib berilgan Topshiriqlar: ${prettyHomeworkLabel(s.homework)}`);
     if (sec.speaking) lines.push(`🗣 Gapirish savollariga berilgan javoblar: ${prettySpeakingLabel(s.speaking)}`);
-    if (sec.participation) lines.push(`🙋 Darsda qatnashish ko‘rsatkichi: ${prettyParticipationLabel(s.participation)}`);
+    if (sec.participation) lines.push(`🙋‍♂️🙋‍♀️ Darsda qatnashish ko‘rsatkichi: ${prettyParticipationLabel(s.participation)}`);
     if (sec.quiz) lines.push(`📝 Quiz / test: ${s.quiz==null?'➖':`${s.quiz}/${src.quizTotal} (${Math.round(s.quiz/src.quizTotal*100)}%)`}`);
 
     const overall = overallResultPercent(s, src);
