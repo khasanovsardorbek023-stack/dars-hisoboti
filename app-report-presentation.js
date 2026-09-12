@@ -83,11 +83,10 @@ mainText = function(src, includePhone=false){
   const sec = normalizedReportSections(src.reportSections);
   const ordered = orderedStudentsForMainReport(src);
   const header = [
-    '📚 Bugun dars hisoboti',
+    '📚 Bugungi dars hisoboti',
     `👥 Guruh: ${src.groupName}`,
     `📅 Sana: ${fmt(src.date)}`
   ];
-  if (src.mainReportRanked) header.push('🏆 O‘quvchilar reyting bo‘yicha tartiblangan');
 
   if (!ordered.length) return header.join('\n') + '\n\nO‘quvchilar kiritilmagan.';
 
