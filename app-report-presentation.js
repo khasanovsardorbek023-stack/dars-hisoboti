@@ -165,14 +165,11 @@ mainText = function(src, includePhone=false){
   return header.join('\n') + '\n\n' + divider + '\n' + blocks.join(`\n${divider}\n`) + '\n' + divider;
 };
 
+// Reytingdagi foizlar aynan Umumiy natijalar foizi bilan bir xil hisoblanadi.
 ratingText = function(src){
-  const ratingGroup = {
-    quizTotal: Math.max(1, Number(src.quizTotal) || 1),
-    reportSections: normalizedReportSections(src.reportSections)
-  };
   const ranked = (src.students || [])
     .filter(s => String(s.name || '').trim())
-    .map((s,index) => ({s,index,p:score(s,ratingGroup)}))
+    .map((s,index) => ({s,index,p:overallResultPercent(s,src) ?? 0}))
     .sort((a,b) => (b.p-a.p) || (a.index-b.index));
 
   return [
@@ -184,14 +181,27 @@ ratingText = function(src){
   ].join('\n');
 };
 
-// Saytdagi reyting kartasi nomini ham yangi nomga moslaymiz.
 function syncRatingTitle(){
   const title = $('ratingCard')?.querySelector('.title');
   if (title) title.textContent = '🏆 O‘quvchining dars davomida qatnashish reytingi';
 }
-const baseRenderRatingReportPresentation = renderRating;
+
+// Saytdagi reyting ro‘yxati ham aynan Umumiy natijalar foizidan foydalanadi.
 renderRating = function(){
-  baseRenderRatingReportPresentation();
+  const g = group();
+  $('ratingCard').classList.toggle('hidden', !g.ratingEnabled);
   syncRatingTitle();
+  if (!g.ratingEnabled) return;
+
+  const src = source();
+  const ranked = (g.students || [])
+    .filter(s => String(s.name || '').trim())
+    .map((s,index) => ({s,index,p:overallResultPercent(s,src) ?? 0}))
+    .sort((a,b) => (b.p-a.p) || (a.index-b.index));
+
+  $('ratingList').innerHTML = ranked.map((r,i) =>
+    `<div class="rank"><div>${['🥇','🥈','🥉'][i]||i+1}</div><b title="${esc(r.s.name)}">${esc(r.s.name)}</b><div class="score">${r.p}%</div></div>`
+  ).join('') || '<div class="sub">Ma’lumot yo‘q</div>';
 };
+
 syncRatingTitle();
