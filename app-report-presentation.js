@@ -146,7 +146,6 @@ mainText = function(src, includePhone=false){
     if (sec.attendance) lines.push(`👨‍🏫 Davomat: ${prettyAttendanceLabel(s.attendance)}`);
 
     if (sec.attendance && s.attendance === 'kelmadi') {
-      lines.push('📊 Umumiy natijalar foizi: 0%');
       return lines.join('\n');
     }
 
