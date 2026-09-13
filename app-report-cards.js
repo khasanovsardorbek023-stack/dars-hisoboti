@@ -12,9 +12,13 @@ mainText = function(src, includePhone=false){
   if (!ordered.length) return header.join('\n') + '\n\nO‘quvchilar kiritilmagan.';
 
   const border = '━━━━━━━━━━━━━━━━━━';
+  const showTop3Medals = !!src.mainReportRanked
+    && src.mainReportMedals !== false
+    && (!state || group().mainReportMedals !== false);
+
   const blocks = ordered.map((item,i) => {
     const s = item.s;
-    const medal = src.mainReportRanked ? (['🥇','🥈','🥉'][i] || '') : '';
+    const medal = showTop3Medals ? (['🥇','🥈','🥉'][i] || '') : '';
     const name = String(s.name || '').trim();
     const studentTitle = `👤 ${medal ? medal + ' ' : ''}${i+1}. ${name}`;
     const lines = [border, studentTitle, border];
